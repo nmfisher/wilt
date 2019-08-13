@@ -62,7 +62,7 @@ class WiltServerHTTPAdapter implements WiltHTTPAdapter {
       if (response.headers.containsValue('application/json')) {
         var couchResp;
         try {
-          couchResp = json.decode(response.body);
+          couchResp = json.decode(utf8.decode(response.bodyBytes));
         } catch (e) {
           jsonResponse.error = true;
           final dynamic errorAsJson = new jsonobject.JsonObjectLite();
