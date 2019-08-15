@@ -393,7 +393,7 @@ class Wilt {
   /// For an update the revision must be specified, this can be in the
   /// document body as a _rev parameter or specified in the call in which
   /// case this will be added to the document body.
-  Future putDocument(String id, jsonobject.JsonObjectLite document,
+  Future putDocument(String id, dynamic document,
       [String rev = null]) {
     if ((id == null) || (document == null)) {
       return _raiseException(WiltException.putDocNoIdBody);

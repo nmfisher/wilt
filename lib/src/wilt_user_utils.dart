@@ -17,8 +17,8 @@ class WiltUserUtils {
   }
 
   /// Get a revision from a json object
-  static String getDocumentRev(jsonobject.JsonObjectLite response) {
-    response.isImmutable = false;
+  static String getDocumentRev(dynamic response) {
+    response["isImmutable"] = false;
     if (response.containsKey('_rev')) {
       // Use this first if present
       return response['_rev'];
@@ -29,8 +29,8 @@ class WiltUserUtils {
 
   /// Adds a CouchDB _rev to the json body of a document
   static String addDocumentRev(
-      jsonobject.JsonObjectLite document, String revision) {
-    document.isImmutable = false;
+      dynamic document, String revision) {
+    document["isImmutable"] = false;
     document["_rev"] = revision;
     return json.encode(document);
   }
@@ -117,20 +117,21 @@ class WiltUserUtils {
   ///
   /// Returned Json Object contains the fields 'name' and 'data', the data
   /// being the attachment data returned from CouchDb.
-  static List<jsonobject.JsonObjectLite> getAttachments(
-      jsonobject.JsonObjectLite document) {
-    final List attachmentsList = new List<jsonobject.JsonObjectLite>();
-    final String docString = document.toString();
-    final Map docMap = json.decode(docString);
+  static List<dynamic> getAttachments(
+      dynamic document) {
+    final List attachmentsList = new List<dynamic>();
+    final Map docMap = document;
     if (docMap.containsKey('_attachments')) {
       final Map attachmentList = docMap['_attachments'];
       attachmentList.keys.forEach((key) {
         final dynamic jsonAttachmentData =
-            new jsonobject.JsonObjectLite.fromJsonString(
+            jsonDecode(
                 WiltUserUtils.mapToJson(attachmentList[key]));
-        final dynamic jsonAttachment = new jsonobject.JsonObjectLite();
-        jsonAttachment.name = key;
-        jsonAttachment.data = jsonAttachmentData;
+        final dynamic jsonAttachment = {
+          "name":key,
+          "data":jsonAttachmentData,
+        };
+        
         attachmentsList.add(jsonAttachment);
       });
     }
