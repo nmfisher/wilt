@@ -58,7 +58,7 @@ void main() {
     test("${testNum++}. No HTTP Adapter", () {
       try {
         final WiltServerClient wilting =
-            new WiltServerClient(hostName, serverPort, scheme, null);
+            new WiltServerClient(hostName, serverPort, scheme);
         wilting.toString();
       } catch (e) {
         expect(e.runtimeType.toString(), 'WiltException');

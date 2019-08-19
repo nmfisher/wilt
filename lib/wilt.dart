@@ -10,6 +10,7 @@ library wilt;
 import 'dart:async';
 import 'dart:convert';
 import 'package:json_object_lite/json_object_lite.dart' as jsonobject;
+import 'package:wilt/src/nosql_document.dart';
 
 part 'src/wilt.dart';
 part 'src/wilt_exception.dart';

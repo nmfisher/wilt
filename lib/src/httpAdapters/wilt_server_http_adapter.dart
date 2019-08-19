@@ -101,7 +101,7 @@ class WiltServerHTTPAdapter implements WiltHTTPAdapter {
         }
       } else {
         final dynamic successAsJson = new jsonobject.JsonObjectLite();
-        successAsJson.ok = true;
+        successAsJson["ok"] = true;
         successAsJson.contentType = response.headers['content-type'];
         jsonResponse.jsonCouchResponse = successAsJson;
       }
@@ -176,7 +176,7 @@ class WiltServerHTTPAdapter implements WiltHTTPAdapter {
           }
         } else {
           final dynamic successAsJson = new jsonobject.JsonObjectLite();
-          successAsJson.ok = true;
+          successAsJson["ok"] = true;
           successAsJson.contentType = response.headers['content-type'];
           jsonResponse.jsonCouchResponse = successAsJson;
         }

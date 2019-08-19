@@ -22,6 +22,6 @@ class WiltBrowserClient extends Wilt {
   static WiltBrowserHTTPAdapter browserHttpAdapter =
       new WiltBrowserHTTPAdapter();
 
-  WiltBrowserClient(host, port, scheme, [Object clientCompletion])
-      : super(host, port, scheme, browserHttpAdapter, clientCompletion);
+  WiltBrowserClient(host, port, scheme)
+      : super(host, port, scheme, browserHttpAdapter);
 }

@@ -22,6 +22,6 @@ part 'src/httpAdapters/wilt_server_http_adapter.dart';
 class WiltServerClient extends Wilt {
   static WiltServerHTTPAdapter serverHttpAdapter = new WiltServerHTTPAdapter();
 
-  WiltServerClient(host, port, scheme, [Object clientCompletion])
-      : super(host, port, scheme, serverHttpAdapter, clientCompletion);
+  WiltServerClient(host, port, scheme)
+      : super(host, port, scheme, serverHttpAdapter);
 }

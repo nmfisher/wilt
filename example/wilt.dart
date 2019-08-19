@@ -36,7 +36,7 @@ void main() async {
   dynamic res = await wilting.createDatabase("wilt_example");
   if (!res.error) {
     final dynamic successResponse = res.jsonCouchResponse;
-    if (successResponse.ok) {
+    if (successResponse["ok"]) {
       print("EXAMPLE:: Example database created OK");
     } else {
       print("EXAMPLE:: Example database creation failed");
@@ -56,7 +56,7 @@ void main() async {
   res = await wilting.putDocument(putId, document);
   if (!res.error) {
     final dynamic successResponse = res.jsonCouchResponse;
-    if (successResponse.ok) {
+    if (successResponse["ok"]) {
       returnedDocRev = WiltUserUtils.getDocumentRev(successResponse);
       print(
           "EXAMPLE:: Example document created OK, revision is $returnedDocRev");
@@ -72,7 +72,7 @@ void main() async {
   res = await wilting.putDocument(putId, document, returnedDocRev);
   if (!res.error) {
     final dynamic successResponse = res.jsonCouchResponse;
-    if (successResponse.ok) {
+    if (successResponse["ok"]) {
       returnedDocRev = WiltUserUtils.getDocumentRev(successResponse);
       print(
           "EXAMPLE:: Example document updated OK, revision is $returnedDocRev");

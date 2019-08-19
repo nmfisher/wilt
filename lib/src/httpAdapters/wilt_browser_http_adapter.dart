@@ -95,7 +95,7 @@ class WiltBrowserHTTPAdapter implements WiltHTTPAdapter {
         }
       } else {
         final dynamic successAsJson = new jsonobject.JsonObjectLite();
-        successAsJson.ok = true;
+        successAsJson["ok"] = true;
         successAsJson.contentType = response.responseHeaders['content-type'];
         jsonResponse.jsonCouchResponse = successAsJson;
       }

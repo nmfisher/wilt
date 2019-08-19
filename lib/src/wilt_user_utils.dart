@@ -18,7 +18,7 @@ class WiltUserUtils {
 
   /// Get a revision from a json object
   static String getDocumentRev(dynamic response) {
-    response["isImmutable"] = false;
+    response.isImmutable = false;
     if (response.containsKey('_rev')) {
       // Use this first if present
       return response['_rev'];
@@ -67,11 +67,9 @@ class WiltUserUtils {
   }
 
   /// Adds a CouchDB _deleted to the json body of a document
-  static jsonobject.JsonObjectLite addDocumentDeleteJo(
-      jsonobject.JsonObjectLite document) {
-    document.isImmutable = false;
-    document["_deleted"] = true;
-    document.isImmutable = false;
+  static NoSqlDocument addDocumentDeleteJo(
+      NoSqlDocument document) {
+    document.deleted = true;
     return document;
   }
 

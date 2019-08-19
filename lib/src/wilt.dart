@@ -75,8 +75,7 @@ class Wilt {
   /// instantiate a Wilt object for use in either the browser or server environment.
   /// You can do this here but you must supply either a browser or server HTTP adapter
   /// to use.
-  Wilt(this._host, this._port, this._scheme, this._httpAdapter,
-      [this._clientCompletion = null]) {
+  Wilt(this._host, this._port, this._scheme, this._httpAdapter) {
     if ((host == null) || (port == null) || (scheme == null)) {
       throw new WiltException(WiltException.badConstParams);
     }
@@ -122,19 +121,6 @@ class Wilt {
   /// Change notification paused state
   bool get changeNotificationsPaused => _changeNotifier.pause;
 
-  /// Completion function
-  var _clientCompletion = null;
-
-  /// Completion callback
-  set resultCompletion(final Object completion) {
-    _clientCompletion = completion;
-  }
-
-  /// Response getter for completion callbacks
-  jsonobject.JsonObjectLite _completionResponse;
-
-  jsonobject.JsonObjectLite get completionResponse => _completionResponse;
-
   /// Authentication, user name
   String _user = null;
 
@@ -173,16 +159,7 @@ class Wilt {
     }
 
     /* Execute the request*/
-    final Future<dynamic> completion =
-        _httpAdapter.httpRequest(method, wiltUrl, data, wiltHeaders)
-          ..then((jsonResponse) {
-            if (_clientCompletion != null) {
-              _completionResponse = jsonResponse;
-              _clientCompletion();
-            }
-          });
-
-    return completion;
+    return _httpAdapter.httpRequest(method, wiltUrl, data, wiltHeaders);
   }
 
   /// Takes a URL and key/value pair for a URL parameter and adds this
@@ -228,11 +205,7 @@ class Wilt {
   /// Raise an exception from a future API call.
   /// If we are using completion throw an exception as normal.
   Future<WiltException> _raiseException(String name) {
-    if (_clientCompletion == null) {
-      return new Future.error(new WiltException(name));
-    } else {
       throw new WiltException(name);
-    }
   }
 
   /// Basic method where only a URL and a method is passed.
@@ -330,56 +303,46 @@ class Wilt {
 
   /// Gets a documents current revision, returns null if
   /// the document does not exist.
-  Future getDocumentRevision(String id) {
+  Future getDocumentRevision(String id) async {
     if (id == null) {
       return _raiseException(WiltException.getDocRevNoId);
     }
 
-    final Completer completer = new Completer();
-    head(id).then((res) {
-      final dynamic headers = WiltUserUtils.mapToJson(res.allResponseHeaders);
-      if (headers != null) {
-        final dynamic jsonHeaders =
-            new jsonobject.JsonObjectLite.fromJsonString(headers);
-        if (jsonHeaders.containsKey(Wilt.etag)) {
-          String ver = jsonHeaders[Wilt.etag];
-          ver = ver.substring(1, ver.length - 1);
-          completer.complete(ver);
-        } else {
-          completer.complete(null);
-        }
+    var res = await head(id);
+    final dynamic headers = WiltUserUtils.mapToJson(res.allResponseHeaders);
+    if (headers != null) {
+    final dynamic jsonHeaders =
+          new jsonobject.JsonObjectLite.fromJsonString(headers);
+      if (jsonHeaders.containsKey(Wilt.etag)) {
+        String ver = jsonHeaders[Wilt.etag];
+        ver = ver.substring(1, ver.length - 1);
+        return ver;
       } else {
-        completer.complete(null);
+        return null;
       }
-    });
-
-    return completer.future;
+    } else {
+      return null;
+    }
   }
 
   /// DELETE's the specified document. Must have a revision.
   /// If preserve is set to true the whole document is preserved
   /// and marked as deleted otherwise only a stub document is
   /// kept. Default is to not preserve.
-  Future deleteDocument(String id, String rev, [bool preserve = false]) {
+  Future deleteDocument(String id, String rev, [bool preserve = false]) async {
     if ((id == null) || (rev == null)) {
       return _raiseException(WiltException.deleteDocNoIdRev);
     }
-    final Completer completer = new Completer();
 
     /* Check the preserve flag */
     if (preserve) {
-      getDocument(id).then((dynamic res) {
-        if (res != null) {
-          dynamic resp = res.jsonCouchResponse;
-          resp = WiltUserUtils.addDocumentDeleteJo(resp);
-          putDocument(id, resp).then((res1) {
-            completer.complete(res1);
-          });
-        } else {
-          completer.complete(null);
-        }
-      });
-      return completer.future;
+      var res = await getDocument(id);
+      if (res != null) {
+        res.jsonCouchResponse._deleted = true;
+        return await putDocument(id, res.jsonCouchResponse);
+      } else {
+        return null;
+      }
     } else {
       String url = id;
       url = _setURLParameter(url, 'rev', rev);
@@ -393,8 +356,7 @@ class Wilt {
   /// For an update the revision must be specified, this can be in the
   /// document body as a _rev parameter or specified in the call in which
   /// case this will be added to the document body.
-  Future putDocument(String id, dynamic document,
-      [String rev = null]) {
+  Future putDocument(String id, Map document) {
     if ((id == null) || (document == null)) {
       return _raiseException(WiltException.putDocNoIdBody);
     }
@@ -403,11 +365,7 @@ class Wilt {
     String jsonData = null;
 
     try {
-      if (rev != null) {
-        jsonData = WiltUserUtils.addDocumentRev(document, rev);
-      } else {
-        jsonData = json.encode(document);
-      }
+      jsonData = jsonEncode(document);
     } catch (e) {
       return _raiseException(WiltException.putDocCantStringify);
     }
