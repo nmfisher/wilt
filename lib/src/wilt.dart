@@ -333,14 +333,17 @@ class Wilt {
     if ((id == null) || (rev == null)) {
       return _raiseException(WiltException.deleteDocNoIdRev);
     }
-
+    print("Deleting document with id [ $id ], rev [ $rev ] and preserve [ $preserve ]");
     /* Check the preserve flag */
     if (preserve) {
       var res = await getDocument(id);
       if (res != null) {
+        res.jsonCouchResponse.isImmutable = false;
         res.jsonCouchResponse._deleted = true;
+        print("Found document [ $id ], executing delete for : ${res.jsonCouchResponse}");
         return await putDocument(id, res.jsonCouchResponse);
       } else {
+        print("Document [ $id ] not found, assuming never existed in datastore.");
         return null;
       }
     } else {
